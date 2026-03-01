@@ -84,7 +84,10 @@
         
         <div id="auth-box">
             <select id="user-location" onchange="loadStationConfig()"><option value="">-- CHỌN ĐỊA ĐIỂM SỰ KIỆN (*) --</option></select>
-            <input type="tel" id="phone" placeholder="Số điện thoại cá nhân (*)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            
+            <input type="tel" id="phone" placeholder="Số điện thoại cá nhân (*)" maxlength="10" 
+                   oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length === 1 && this.value !== '0') this.value = '';">
+            
             <input type="text" id="name" placeholder="Họ và tên (*)">
             <input type="text" id="school" placeholder="Trường THPT (*)">
             <button class="btn-spin" style="background: linear-gradient(135deg, #0054a6, #00a8ff);" onclick="handleAuth()"><i class="fas fa-sign-in-alt"></i> ĐĂNG KÝ VÀO TRẠM</button>
@@ -235,7 +238,7 @@
         
         if (!loc) { if (locSelect.options.length <= 1 && locSelect.options[0].text.includes("chưa có trạm")) return Swal.fire("Thông báo", "Hiện chưa có Trạm mở. Vui lòng quay lại sau!", "warning"); return Swal.fire("Lỗi", "Vui lòng CHỌN ĐỊA ĐIỂM!", "error"); }
         
-        // 🔥 RÀNG BUỘC ĐỊNH DẠNG SỐ ĐIỆN THOẠI CHUẨN VIỆT NAM 🔥
+        // 🔥 LỚP KHÓA SỐ 2: KIỂM TRA ĐỊNH DẠNG ĐẦU SỐ KHI BẤM NÚT 🔥
         const phoneRegex = /^(03|05|07|08|09)[0-9]{8}$/;
         if (!phoneRegex.test(ph)) {
             return Swal.fire("Lỗi Xác Thực", "Số điện thoại không hợp lệ!<br>Vui lòng nhập đúng số thật có 10 chữ số (Ví dụ: <b>09</b>xxxx, <b>03</b>xxxx...)", "error");
