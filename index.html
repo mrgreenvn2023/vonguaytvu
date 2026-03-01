@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VÒNG QUAY MAY MẮN - TVU</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+        
+        :root { --blue: #0054a6; --cyan: #00d4ff; }
+        body, html { margin: 0; padding: 0; font-family: 'Nunito', sans-serif; min-height: 100vh; background: url('upload/image/tvubg.jpg') center center / cover no-repeat fixed; }
+        
+        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 11, 26, 0.75); z-index: 0; }
+        #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 1; }
+        
+        .main-container { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 30px 15px; box-sizing: border-box; flex-direction: column;}
+        
+        .card { background: rgba(255, 255, 255, 0.96); padding: 25px 20px; border-radius: 20px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); position: relative; border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(10px); box-sizing: border-box;}
+        
+        .brand-header { margin-bottom: 15px; border-bottom: 2px dashed #dce1e6; padding-bottom: 10px; }
+        .tvu-logo { width: 80px; height: auto; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); margin-bottom: 5px; transition: transform 0.3s;}
+        .tvu-logo:hover { transform: scale(1.05); }
+        .event-title { color: var(--blue); margin: 0; font-size: 18px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+        
+        input, select { width: 100%; padding: 14px 15px; margin: 8px 0; border: 1px solid #ced4da; border-radius: 10px; box-sizing: border-box; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 600; background: #f8f9fa;}
+        input:focus, select:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 3px rgba(0,84,166,0.1); background: #fff;}
+        select { color: var(--blue); cursor: pointer; }
+        
+        .btn-spin { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 18px; transition: all 0.3s; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(56,239,125,0.4);}
+        .btn-spin:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(56,239,125,0.6); }
+        .btn-spin:disabled { background: #6c757d; cursor: not-allowed; box-shadow: none; transform: none; }
+        
+        .btn-exit-small { position: absolute; top: 15px; right: 15px; background: #ffebee; color: #dc3545; border: 1px solid #ffc107; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px; z-index: 100; transition: 0.3s;}
+        .btn-exit-small:hover { background: #dc3545; color: white; border-color: #dc3545; }
+        
+        .user-panel { background: #e8f4fd; padding: 15px; border-radius: 12px; text-align: left; font-size: 14px; margin-bottom: 10px; border-left: 5px solid var(--blue); color: #2c3e50;}
+        .user-detail-grid { display: grid; grid-template-columns: 1fr; gap: 5px; font-size: 13px; color: #555; }
+        
+        .history-box { margin-top:15px; text-align:left; background:#fff; padding:15px; border-radius:10px; font-size:13px; border:1px solid #dce1e6; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);}
+        .history-item { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #f1f4f8; }
+        .history-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .history-time { font-size: 11px; color: #888; margin-bottom: 2px; }
+        .history-detail { display: flex; justify-content: space-between; align-items: center; }
+        .history-loc { font-weight: bold; color: #333; }
+        .history-prize { font-weight: 800; text-align: right;}
+
+        .mission-box { background: linear-gradient(135deg, #8e2de2, #4a00e0); color: white; padding: 12px; border-radius: 10px; margin: 10px 0; display: none; cursor: pointer; box-shadow: 0 5px 15px rgba(142,45,226,0.4); animation: pulse 2s infinite;}
+        .mission-box:hover { transform: scale(1.02); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(142,45,226,0.7); } 70% { box-shadow: 0 0 0 10px rgba(142,45,226,0); } 100% { box-shadow: 0 0 0 0 rgba(142,45,226,0); } }
+
+        #wheel-wrapper { position: relative; width: 280px; height: 280px; margin: 15px auto; }
+        /* Xóa bỏ hiệu ứng transition cũ ở CSS để điều khiển toàn bộ bằng Javascript */
+        canvas { width: 100%; height: 100%; border-radius: 50%; box-sizing: border-box; }
+        
+        #pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-top: 30px solid #dc3545; z-index: 100; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.3));}
+        
+        @keyframes prizeDance { 0% { transform: scale(0.8) translateY(0); } 25% { transform: scale(1.1) translateY(-10px) rotate(5deg); } 50% { transform: scale(1.0) translateY(0) rotate(-5deg); } 75% { transform: scale(1.1) translateY(-5px) rotate(3deg); } 100% { transform: scale(1) translateY(0) rotate(0); } }
+        .dancing-prize { animation: prizeDance 1.5s ease-in-out infinite; filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)); max-width: 150px; margin: 20px auto; display: block; }
+        
+        .admin-link { margin-top: 20px; font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none; display: inline-block; transition: 0.3s; z-index: 9999; font-weight: 600; padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);}
+        .admin-link:hover { color: #fff; background: rgba(255,255,255,0.1); }
+        .copyright-text { margin-top: 15px; font-size: 12px; color: rgba(255,255,255,0.5); z-index: 9999; text-align: center; letter-spacing: 0.5px;}
+
+        #loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.95); z-index:99999; display:flex; flex-direction: column; justify-content:center; align-items:center; font-weight:800; color:var(--blue); font-size: 16px;}
+    </style>
+</head>
+<body>
+<div class="bg-overlay"></div>
+<div id="particles-js"></div>
+<audio id="tickSound" src="audio/quay.mp3" preload="auto"></audio>
+<audio id="winSound" src="audio/trung.mp3" preload="auto"></audio>
+<audio id="loseSound" src="audio/truot.mp3" preload="auto"></audio>
+
+<div id="loading-overlay"><i class="fas fa-circle-notch fa-spin" style="font-size: 40px; margin-bottom: 15px;"></i> Đang kết nối...</div>
+
+<div class="main-container">
+    <div class="card">
+        <div class="brand-header">
+            <img src="upload/image/logotvu.png" alt="Logo TVU" class="tvu-logo" onerror="this.style.display='none'">
+            <h3 class="event-title">VÒNG QUAY MAY MẮN</h3>
+        </div>
+        
+        <div id="auth-box">
+            <select id="user-location" onchange="loadStationConfig()"><option value="">-- CHỌN ĐỊA ĐIỂM SỰ KIỆN (*) --</option></select>
+            <input type="tel" id="phone" placeholder="Số Điện Thoại (*)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <input type="text" id="name" placeholder="Họ và tên (*)">
+            <input type="text" id="school" placeholder="Trường THPT (*)">
+            <button class="btn-spin" style="background: linear-gradient(135deg, #0054a6, #00a8ff);" onclick="handleAuth()"><i class="fas fa-sign-in-alt"></i> ĐĂNG KÝ QUAY THƯỞNG</button>
+        </div>
+
+        <div id="game-box" style="display:none">
+            <button class="btn-exit-small" onclick="logoutContestant()"><i class="fas fa-sign-out-alt"></i> Thoát </button>
+            
+            <div class="user-panel" id="user-profile-top"></div>
+            
+            <div id="wheel-wrapper"><div id="pointer"></div><canvas id="wheel"></canvas></div>
+            
+            <div id="user-turns-bottom" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding:10px; background:#fff; border-radius:10px; border:1px solid #dce1e6;"></div>
+
+            <div id="mission-box" class="mission-box" onclick="doMission()">
+                <i id="mission-icon-display" class="fab fa-facebook" style="font-size: 20px; margin-bottom:5px;"></i><br>
+                <b>LÀM NHIỆM VỤ ĐỂ NHẬN THÊM LƯỢT QUAY!</b><br>
+                <small id="mission-text-display">(Nhấn vào đây để thực hiện)</small>
+            </div>
+
+            <button id="spin-btn" class="btn-spin" onclick="startSpin()"><i class="fas fa-play"></i> QUAY NGAY</button>
+
+            <div id="user-history-bottom"></div>
+        </div>
+    </div>
+    
+    <a id="admin-link-btn" href="admin.html" class="admin-link"><i class="fas fa-shield-alt"></i> Dành cho Ban Tổ Chức</a>
+    <div class="copyright-text">© 2026 Bản quyền thuộc về Đại học Trà Vinh</div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFvwvjheytoxNtnneWpIsGoHuqpYBreE__bJ3JZdsWW42baeAUzWeFS4yJViQQ2jwORQ/exec";
+    
+    let dynamicPrizes = []; let dynamicImages = {}; let colors = []; let user = {}; let rotation = 0; let spinning = false; let pollInterval;
+    let systemMissionLink = "https://www.facebook.com/TraVinhUniversity.TVU"; 
+    const baseColors = ['#808285', '#0054a6', '#00d4ff', '#28a745', '#f39c12', '#9b59b6', '#e84393', '#ed1c24'];
+    
+    // Biến lưu trạng thái Idle Spin
+    let isIdle = false;
+    let idleReq;
+
+    particlesJS("particles-js", {
+        "particles": { "number": { "value": 80, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#00d4ff" }, "shape": { "type": "circle" }, "size": { "value": 2.5, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#00d4ff", "opacity": 0.5, "width": 1 }, "move": { "enable": true, "speed": 1.2 } },
+        "interact": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" }, "resize": true }, "modes": { "grab": { "distance": 150, "line_linked": { "opacity": 1 } } } },
+        "retina_detect": true
+    });
+
+    function api(params, cb) {
+        try {
+            const callbackName = 'cb_' + Math.round(Math.random() * 1000000);
+            const script = document.createElement('script');
+            let timeoutId = setTimeout(() => { if (window[callbackName]) { document.body.removeChild(script); delete window[callbackName]; if(params.action !== 'syncState') Swal.fire("Lỗi", "Mạng yếu!", "error"); document.getElementById('loading-overlay').style.display = 'none'; } }, 15000);
+            window[callbackName] = function(data) { clearTimeout(timeoutId); if(script.parentNode) document.body.removeChild(script); delete window[callbackName]; if(data && data.error && params.action !== 'syncState') Swal.fire("Lỗi", data.error, "error"); else cb(data); };
+            const qs = Object.keys(params).map(k => k + '=' + encodeURIComponent(params[k])).join('&');
+            script.src = SCRIPT_URL + (SCRIPT_URL.indexOf('?') >= 0 ? '&' : '?') + qs + '&callback=' + callbackName + '&t=' + Date.now();
+            document.body.appendChild(script);
+        } catch(e) {}
+    }
+
+    // 🔥 HÀM BẬT CHẾ ĐỘ QUAY CHẬM (IDLE) 🔥
+    function startIdleSpin() {
+        if (spinning || isIdle) return;
+        isIdle = true;
+        document.getElementById('wheel').style.transition = 'none'; // Tắt transition để xoay mượt bằng JS
+        function step() {
+            if (!isIdle) return;
+            rotation += 0.4; // Tốc độ quay chậm đều đặn (0.4 độ / frame)
+            document.getElementById('wheel').style.transform = `rotate(${rotation}deg)`;
+            idleReq = requestAnimationFrame(step);
+        }
+        idleReq = requestAnimationFrame(step);
+    }
+
+    // 🔥 HÀM TẮT CHẾ ĐỘ QUAY CHẬM 🔥
+    function stopIdleSpin() {
+        isIdle = false;
+        cancelAnimationFrame(idleReq);
+    }
+
+    window.onload = function() {
+        api({ action: "getConfig" }, (res) => {
+            let locSelect = document.getElementById('user-location'); locSelect.innerHTML = '<option value="">-- CHỌN ĐỊA ĐIỂM SỰ KIỆN (*) --</option>';
+            if (res && res.locations && res.locations.length > 0) { res.locations.forEach(l => { if (l.trim() !== "") locSelect.innerHTML += `<option value="${l}">${l}</option>`; }); } 
+            
+            if(res && res.sysConfig) {
+                if(res.sysConfig.missionLink) systemMissionLink = res.sysConfig.missionLink;
+                if(res.sysConfig.missionText) document.getElementById('mission-text-display').innerText = "(" + res.sysConfig.missionText + ")";
+                if(res.sysConfig.missionIcon) document.getElementById('mission-icon-display').className = res.sysConfig.missionIcon;
+            }
+
+            document.getElementById('loading-overlay').style.display = 'none';
+            let savedUser = localStorage.getItem('tvu_user_session');
+            if(savedUser) { 
+                user = JSON.parse(savedUser); loadStationConfig(user.location); 
+                document.getElementById('admin-link-btn').style.display = 'none';
+                document.getElementById('auth-box').style.display = 'none'; document.getElementById('game-box').style.display = 'block'; 
+                renderUser(); startPolling(); 
+            }
+        });
+    };
+
+    function loadStationConfig(fixedLoc) {
+        let loc = fixedLoc || document.getElementById('user-location').value; if(!loc) return;
+        api({ action: "getConfig", location: loc }, (res) => {
+            dynamicPrizes = res.prizes; dynamicImages = res.images; colors = dynamicPrizes.map((p, i) => baseColors[i % baseColors.length]); 
+            draw();
+            startIdleSpin(); // Bắt đầu quay chậm ngay sau khi vẽ xong bánh xe
+        });
+    }
+
+    function draw() {
+        if(dynamicPrizes.length === 0) return;
+        const canvas = document.getElementById('wheel'); const ctx = canvas.getContext('2d');
+        const arc = (Math.PI * 2) / dynamicPrizes.length; canvas.width = 500; canvas.height = 500; ctx.clearRect(0, 0, canvas.width, canvas.height);
+        dynamicPrizes.forEach((p, i) => {
+            ctx.beginPath(); ctx.fillStyle = colors[i]; ctx.moveTo(250, 250); ctx.arc(250, 250, 250, i * arc, (i + 1) * arc); ctx.fill();
+            ctx.save(); ctx.translate(250, 250); ctx.rotate(i * arc + arc / 2);
+            ctx.fillStyle = "white"; ctx.font = "bold 20px Nunito, sans-serif"; ctx.textAlign = "right"; ctx.fillText(p.length > 15 ? p.substring(0, 13) + "..." : p, 230, 10); ctx.restore();
+        });
+    }
+
+    function renderUser() {
+        document.getElementById('user-profile-top').innerHTML = `
+            <div class="user-detail-grid">
+                <div><i class="fas fa-user" style="color:var(--blue); width:15px;"></i> <b>${user.name}</b> <span style="color:#6c757d">(${user.school})</span></div>
+                <div><i class="fas fa-phone-alt" style="color:var(--blue); width:15px;"></i> ${user.phone}</div>
+                <div style="background: rgba(0,84,166,0.1); padding: 6px 10px; border-radius: 6px; margin-top: 5px; color:#0054a6; font-weight:bold;">
+                    <i class="fas fa-map-marker-alt" style="width:15px;"></i> Trạm hiện tại: ${user.location}
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('user-turns-bottom').innerHTML = `
+            <div><i class="fas fa-ticket-alt" style="color:#f39c12"></i> Lượt quay: <span style="color:red; font-size:18px; font-weight:900;">${user.turns}</span></div>
+            <button onclick="forceSync()" style="background:none; border:none; color:#0054a6; font-size:13px; font-weight:bold; cursor:pointer; padding:0; text-decoration:underline;"><i class="fas fa-sync-alt"></i> Cập nhật</button>
+        `;
+
+        document.getElementById('spin-btn').disabled = (user.turns <= 0);
+        document.getElementById('mission-box').style.display = (user.mission === 'pending') ? 'block' : 'none';
+
+        let histHtml = '';
+        if (user.spinHistory && user.spinHistory.length > 0) {
+            histHtml = `<div class="history-box"><h4 style="margin:0 0 10px 0; color:#0054a6; font-size:13px; border-bottom: 1px dashed #ccc; padding-bottom: 5px;"><i class="fas fa-history"></i> LỊCH SỬ THAM GIA:</h4>`;
+            let revHist = [...user.spinHistory].reverse();
+            revHist.forEach(h => {
+                let d = new Date(h.time).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
+                let pColor = h.prize === 'May mắn lần sau' ? '#6c757d' : '#dc3545';
+                let pText = h.prize === 'May mắn lần sau' ? 'Trượt' : h.prize;
+                histHtml += `
+                <div class="history-item">
+                    <div class="history-time"><i class="far fa-clock"></i> ${d}</div>
+                    <div class="history-detail">
+                        <span class="history-loc"><i class="fas fa-map-marker-alt" style="color:#11998e;"></i> ${h.location}</span>
+                        <span class="history-prize" style="color:${pColor};">${pText}</span>
+                    </div>
+                </div>`;
+            });
+            histHtml += `</div>`;
+        } else {
+            histHtml = `<div class="history-box" style="text-align:center; color:#999; font-style:italic;">Chưa có lịch sử quay số</div>`;
+        }
+        document.getElementById('user-history-bottom').innerHTML = histHtml;
+    }
+
+    function logoutContestant() { clearInterval(pollInterval); localStorage.clear(); location.reload(); }
+
+    function handleAuth() {
+        let locSelect = document.getElementById('user-location'); let loc = locSelect.value;
+        let ph = document.getElementById('phone').value.trim(); let n = document.getElementById('name').value.trim(); let s = document.getElementById('school').value.trim();
+        if (!loc) { if (locSelect.options.length <= 1 && locSelect.options[0].text.includes("chưa có trạm")) return Swal.fire("Thông báo", "Hiện chưa có Trạm mở. Vui lòng quay lại sau!", "warning"); return Swal.fire("Lỗi", "Vui lòng CHỌN ĐỊA ĐIỂM!", "error"); }
+        if (!ph || ph.length !== 10) return Swal.fire("Lỗi", "Số điện thoại phải đúng 10 số!", "error");
+        if (!n || !s) return Swal.fire("Lỗi", "Vui lòng nhập đủ Họ Tên và Trường!", "error");
+        
+        Swal.fire({title: 'Đang ghi danh...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+        api({ action: "auth", phone: ph, name: n, school: s, location: loc }, (res) => {
+            Swal.close(); user = res; user.location = loc; localStorage.setItem('tvu_user_session', JSON.stringify(user));
+            document.getElementById('admin-link-btn').style.display = 'none';
+            document.getElementById('auth-box').style.display = 'none'; document.getElementById('game-box').style.display = 'block';
+            renderUser(); startPolling(); 
+        });
+    }
+
+    function startPolling() {
+        if(pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(() => {
+            if(!spinning) {
+                api({ action: "syncState", phone: user.phone }, (res) => {
+                    if(!res.error) {
+                        if(user.turns !== res.turns || user.mission !== res.mission || (user.spinHistory && res.spinHistory && user.spinHistory.length !== res.spinHistory.length)) {
+                            user.turns = res.turns; user.mission = res.mission; user.spinHistory = res.spinHistory;
+                            localStorage.setItem('tvu_user_session', JSON.stringify(user)); renderUser();
+                        }
+                    }
+                });
+            }
+        }, 5000);
+    }
+
+    window.forceSync = function() {
+        if(!user || !user.phone || spinning) return;
+        Swal.fire({title: 'Đang làm mới...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+        api({ action: "syncState", phone: user.phone }, (res) => {
+            Swal.close();
+            if(!res.error) {
+                let oldMission = user.mission; user.turns = res.turns; user.mission = res.mission; user.spinHistory = res.spinHistory;
+                localStorage.setItem('tvu_user_session', JSON.stringify(user)); renderUser();
+                if(res.mission === 'pending' && oldMission !== 'pending') { Swal.fire("TIN VUI!", "Admin đã tặng thêm lượt cho bạn. Hãy làm nhiệm vụ để nhận ngay!", "info"); } 
+                else if(res.mission !== 'pending') { Swal.fire("Thông báo", "Dữ liệu đã được làm mới!", "success"); }
+            }
+        });
+    };
+
+    document.addEventListener("visibilitychange", function() {
+        if (document.visibilityState === 'visible' && user && user.phone && !spinning) {
+            api({ action: "syncState", phone: user.phone }, (res) => {
+                if(!res.error) { user.turns = res.turns; user.mission = res.mission; user.spinHistory = res.spinHistory; localStorage.setItem('tvu_user_session', JSON.stringify(user)); renderUser(); }
+            });
+        }
+    });
+
+    function doMission() {
+        window.open(systemMissionLink, '_blank');
+        Swal.fire({title: 'Đang xác nhận...', didOpen: () => Swal.showLoading()});
+        api({ action: "completeMission", phone: user.phone }, (res) => {
+            if(res.status === 'success') {
+                Swal.fire("THÀNH CÔNG!", "Bạn đã nhận được thêm 1 LƯỢT QUAY!", "success");
+                user.turns = res.turns; user.mission = 'completed';
+                localStorage.setItem('tvu_user_session', JSON.stringify(user)); renderUser();
+            }
+        });
+    }
+
+    function startSpin() {
+        if(spinning || user.turns <= 0) return; 
+        spinning = true; 
+        
+        // 1. Tạm dừng hiệu ứng quay chậm
+        stopIdleSpin();
+
+        Swal.fire({title: 'Đang tạo mã quay...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+        api({ action: "spin", phone: user.phone }, (res) => {
+            Swal.close();
+            if(res.error) { 
+                spinning = false; 
+                startIdleSpin(); // Có lỗi thì cho quay chậm lại
+                return Swal.fire("Lỗi", res.error, "error"); 
+            }
+            
+            user.turns--; renderUser(); 
+            let winA = document.getElementById('winSound'); let loseA = document.getElementById('loseSound'); let tickA = document.getElementById('tickSound');
+            winA.volume=0; winA.play().then(()=>winA.pause()).catch(()=>{}); winA.volume=1; loseA.volume=0; loseA.play().then(()=>loseA.pause()).catch(()=>{}); loseA.volume=1;
+
+            let winIdx = dynamicPrizes.indexOf(res.prize); if(winIdx === -1) winIdx = 0; 
+            const slice = 360 / dynamicPrizes.length;
+            
+            // 2. Tính toán chính xác góc quay mới dựa trên góc đang quay chậm hiện tại
+            let currentMod = rotation % 360;
+            let targetAngle = 270 - (winIdx * slice + slice / 2) + (Math.floor(Math.random() * 20) - 10);
+            targetAngle = (targetAngle % 360 + 360) % 360; // Đảm bảo góc luôn dương
+            let diff = targetAngle - currentMod;
+            if (diff < 0) diff += 360;
+            
+            // Cộng thêm 8 vòng xoay siêu tốc
+            rotation += (360 * 8) + diff;
+            
+            let wheel = document.getElementById('wheel');
+            // Cấp lại hiệu ứng xoay mượt 5 giây của CSS
+            wheel.style.transition = 'transform 5s cubic-bezier(0.2, 0, 0.1, 1)';
+            wheel.style.transform = `rotate(${rotation}deg)`;
+            
+            tickA.volume = 1.0; let tickInt = setInterval(() => { tickA.currentTime=0; tickA.play().catch(()=>{}); }, 150);
+
+            setTimeout(() => {
+                clearInterval(tickInt); spinning = false; const p = dynamicPrizes[winIdx];
+                if(p === "May mắn lần sau") {
+                    loseA.play().catch(()=>{}); 
+                    Swal.fire("RẤT TIẾC!", "Trượt rồi, chúc bạn may mắn lần sau nhé!", "error").then(() => startIdleSpin());
+                } else {
+                    winA.play().catch(()=>{}); confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                    let img = dynamicImages[p] ? `<img src="${dynamicImages[p]}" class="dancing-prize" onerror="this.style.display='none'">` : '';
+                    Swal.fire({ title: 'TUYỆT VỜI!', html: `Chúc mừng bạn đã trúng:<br><b style="color:#dc3545; font-size:22px;">${p}</b>` + img, icon: 'success' }).then(() => startIdleSpin());
+                    user.prizes = p; 
+                }
+                user.spinHistory = res.spinHistory; 
+                localStorage.setItem('tvu_user_session', JSON.stringify(user)); renderUser();
+                
+            }, 5000);
+        });
+    }
+</script>
+</body>
+</html>

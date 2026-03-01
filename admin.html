@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>QUẢN TRỊ VÒNG QUAY - TVU</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+        body { font-family: 'Nunito', sans-serif; background: #eef2f6; padding: 20px; margin: 0; color: #2c3e50;}
+        .container { width: 100%; max-width: 1200px; background: #ffffff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin: 0 auto 50px auto;}
+        #login-box { max-width: 400px; text-align: center; margin: 10vh auto; background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,84,166,0.1);}
+        #login-box input { padding: 15px; border: 1px solid #dce1e6; border-radius: 10px; width: 100%; margin-bottom: 20px; box-sizing: border-box; font-family: 'Nunito', sans-serif; font-size: 15px; transition: 0.3s;}
+        #login-box input:focus { border-color: #0054a6; outline: none; box-shadow: 0 0 0 3px rgba(0,84,166,0.1);}
+        h2 { color: #0054a6; margin: 0 0 20px 0; font-weight: 800; font-size: 24px;}
+        .header-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #f1f4f8; padding-bottom: 20px;}
+        .user-greeting { display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 8px 15px; border-radius: 50px; border: 1px solid #e9ecef; font-weight: 600;}
+        .user-greeting i { color: #0054a6; font-size: 18px;}
+        .btn { font-family: 'Nunito', sans-serif; background: #0054a6; color: white; border: none; padding: 12px 20px; font-weight: 700; font-size: 15px; border-radius: 10px; cursor: pointer; transition: all 0.3s; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;}
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,84,166,0.3);}
+        .btn-go-spin { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; border: none; padding: 10px 20px; font-weight: 700; border-radius: 8px; cursor: pointer; margin-right: 10px; transition: 0.3s;}
+        .btn-logout { background: linear-gradient(135deg, #cb2d3e, #ef473a); color: white; border: none; padding: 10px 20px; font-weight: 700; border-radius: 8px; cursor: pointer; transition: 0.3s;}
+        .tabs { display: flex; background: #f8f9fa; padding: 5px; border-radius: 12px; margin-bottom: 25px; gap: 5px; flex-wrap: wrap;}
+        .tab-btn { flex: 1; padding: 12px; text-align: center; background: transparent; border: none; font-size: 14px; font-weight: 700; color: #6c757d; cursor: pointer; border-radius: 8px; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;}
+        .tab-btn:hover { color: #0054a6; background: rgba(0,84,166,0.05);}
+        .tab-btn.active { color: #fff; background: #0054a6; box-shadow: 0 4px 10px rgba(0,84,166,0.2); }
+        .tab-content { display: none; animation: fadeIn 0.4s ease-out; }
+        .tab-content.active { display: block; }
+        .system-box { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #e1e8ed; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+        .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-top: 15px; align-items: stretch; }
+        .sys-row input, .sys-row select { padding: 12px; border-radius: 8px; border: 1px solid #ced4da; width: 100%; box-sizing: border-box; font-family: 'Nunito', sans-serif; font-weight: 600; background: #f8f9fa; margin-bottom: 15px;}
+        .sys-row input:last-child, .sys-row select:last-child { margin-bottom: 0; }
+        .cfg-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: center; background: #ffffff; padding: 15px; border-radius: 10px; border: 1px solid #e1e8ed; border-left: 5px solid #0054a6; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: 0.3s;}
+        .cfg-row input { padding: 10px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; width:100%; font-family: 'Nunito', sans-serif;}
+        .upload-area { display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 8px; border-radius: 8px; border: 1px dashed #ced4da; flex: 1.5;}
+        .img-preview { width: 40px; height: 40px; object-fit: contain; border-radius: 6px; border: 1px solid #e9ecef; background: #fff;}
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card { position: relative; padding: 25px; border-radius: 16px; color: #fff; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: center;}
+        .stat-card .icon-bg { position: absolute; right: -15px; bottom: -20px; font-size: 100px; opacity: 0.2; transform: rotate(-10deg); transition: 0.3s;}
+        .stat-card .title { font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; opacity: 0.9;}
+        .stat-card h3 { font-size: 42px; font-weight: 800; margin: 0; line-height: 1;}
+        .card-blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .card-green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .card-orange { background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%); }
+        .filter-box { display: flex; gap: 15px; margin-bottom: 25px; background: #f8f9fa; padding: 20px; border-radius: 12px; align-items: center; border: 1px solid #e1e8ed;}
+        .filter-box select, .filter-box input { padding: 10px 15px; border-radius: 8px; border: 1px solid #ced4da; font-family: 'Nunito', sans-serif;}
+        .winner-row { background: #fff; border: 1px solid #e1e8ed; border-left: 5px solid #0054a6; margin-bottom: 12px; padding: 15px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;}
+        .winner-img-box { width: 55px; height: 55px; background: #f1f4f8; border-radius: 10px; border: 1px solid #dce1e6; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-right: 15px; padding: 5px;}
+        .winner-img-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .btn-mission { background: #e8f4fd; color: #0054a6; border: 1px solid #0054a6; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 13px;}
+        .btn-mission:hover { background: #0054a6; color: white; }
+        .btn-mission.disabled { background: #f1f4f8; color: #999; border-color: #ddd; cursor: not-allowed; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 14px; background: #fff; text-align: left; }
+        .data-table th, .data-table td { padding: 12px 15px; border-bottom: 1px solid #e1e8ed; }
+        .data-table th { background: #f8f9fa; color: #0054a6; font-weight: 800; position: sticky; top: 0; z-index: 10; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;}
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: 800; display: inline-block; min-width: 60px; text-align: center;}
+        .bg-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
+        .bg-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
+        
+        /* Box hiển thị tỉ lệ trượt */
+        #lose-rate-container { text-align: right; padding: 12px 15px; font-size: 14px; background: #ffebee; border: 1px dashed #dc3545; border-radius: 8px; margin-top: 10px; color: #c0392b; font-weight: bold; display: none; }
+        
+        #admin-panel { display: none; }
+    </style>
+</head>
+<body>
+<div id="login-box">
+    <img src="upload/image/logotvu.png" width="120" style="margin-bottom: 25px;" onerror="this.style.display='none'">
+    <h2>HỆ THỐNG QUẢN TRỊ</h2>
+    <input type="text" id="username" placeholder="Tên đăng nhập">
+    <input type="password" id="password" placeholder="Mật khẩu">
+    <button type="button" class="btn" onclick="checkLogin()"><i class="fas fa-sign-in-alt"></i> ĐĂNG NHẬP</button>
+</div>
+
+<div id="admin-panel" class="container">
+    <div class="header-panel">
+        <div>
+            <h2>BẢNG ĐIỀU KHIỂN</h2>
+            <div class="user-greeting"><i class="fas fa-user-circle"></i><span>Xin chào, <b id="current-admin-name"></b></span></div>
+        </div>
+        <div>
+            <button type="button" class="btn-go-spin" onclick="window.open('index.html','_blank')"><i class="fas fa-play-circle"></i> VÒNG QUAY</button>
+            <button type="button" class="btn-logout" onclick="logout()"><i class="fas fa-power-off"></i> Thoát</button>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <button type="button" class="tab-btn active" onclick="openTab('tab-config', this)"><i class="fas fa-sliders-h"></i> Cấu hình Trạm</button>
+        <button type="button" class="tab-btn" onclick="openTab('tab-history', this)"><i class="fas fa-users"></i> Quản Lý Thí Sinh</button>
+        <button type="button" class="tab-btn" onclick="openTab('tab-report', this)"><i class="fas fa-chart-bar"></i> Thống kê (Chốt sổ)</button>
+        <button type="button" class="tab-btn" onclick="openTab('tab-data', this)"><i class="fas fa-list-alt"></i> Dữ liệu Sheet</button>
+        <button type="button" class="tab-btn" id="tab-btn-acc" style="display:none;" onclick="openTab('tab-accounts', this)"><i class="fas fa-users-cog"></i> Tài khoản</button>
+        <button type="button" class="tab-btn" id="tab-btn-sys" style="display:none;" onclick="openTab('tab-system', this)"><i class="fas fa-cogs"></i> Cài Đặt Hệ Thống</button>
+    </div>
+
+    <div id="tab-config" class="tab-content active">
+        <div id="super-station-list-box" style="background:#fff; border: 1px solid #e1e8ed; padding:20px; border-radius:15px; margin-bottom: 20px; border-left: 5px solid #11998e; display: none;">
+            <label style="font-weight:800; color:#11998e; font-size:15px;"><i class="fas fa-database"></i> KHO TRẠM ĐÃ LƯU:</label>
+            <select id="super-saved-stations" onchange="loadStationByName(this.value)" style="border: 1px solid #ced4da; padding:12px; width:100%; border-radius:8px; font-weight:700; background:#f8f9fa; outline:none; margin-top:10px; font-family: 'Nunito', sans-serif;"></select>
+        </div>
+        
+        <div class="system-box">
+            <label style="font-weight:800; color:#0054a6; font-size:16px;"><i class="fas fa-map-marked-alt"></i> CẤU HÌNH TRẠM HIỆN TẠI</label>
+            <div class="settings-grid">
+                <div class="sys-row" style="display: flex; flex-direction: column; margin-top:0;">
+                    <input type="text" id="cfg-location" placeholder="Tên địa điểm trực (VD: Trường THPT A)" style="margin:0; width:100%;">
+                    <input type="number" id="cfg-expected" placeholder="Dự kiến Học sinh tham gia" oninput="window.calculateAuto()" style="margin:0; width:100%;">
+                </div>
+                
+                <div style="border: 1px solid #ced4da; border-radius: 8px; padding: 15px; background: #fff; min-width: 300px;">
+                    <div style="font-weight: 800; color: #0054a6; font-size: 13px; text-transform: uppercase; margin-bottom: 12px;"><i class="fas fa-calculator"></i> CHỌN PHƯƠNG THỨC TÍNH:</div>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 14px; font-weight: bold; width: 100px; color:#e84393;">
+                            <input type="radio" name="calcType" value="percent" checked onchange="window.toggleCalcType()"> Tỉ lệ (%)
+                        </label>
+                        <select id="cfg-mode-percent" onchange="window.toggleMode()" style="flex: 1; padding: 8px; font-size: 13px; border-radius: 6px; margin:0;">
+                            <option value="percent_manual">Chỉnh tay</option>
+                            <option value="percent_auto">Tự động (Máy tự chia %)</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 14px; font-weight: bold; width: 100px; color:#0054a6;">
+                            <input type="radio" name="calcType" value="multiplier" onchange="window.toggleCalcType()"> Bội số
+                        </label>
+                        <select id="cfg-mode-multiplier" onchange="window.toggleMode()" style="flex: 1; padding: 8px; font-size: 13px; border-radius: 6px; margin:0;" disabled style="background:#e9ecef;">
+                            <option value="manual">Chỉnh tay</option>
+                            <option value="auto">Tự động (Máy tự tính)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="assign-box" style="margin-top:20px; background:#e8f4fd; padding:15px; border-radius:10px; display:none;">
+                <label style="font-weight:700; color:#0054a6;"><i class="fas fa-user-check"></i> Chỉ định Nhân viên trực trạm này:</label>
+                <select id="cfg-assign-admin" style="margin-top:10px; border: 1px solid #b8daff; padding:10px; width:100%; border-radius:8px; font-weight:700; background:#fff; outline:none;"></select>
+            </div>
+        </div>
+        
+        <div style="font-weight: 800; display: flex; padding: 0 15px; color: #6c757d; margin-bottom: 10px; font-size:13px; text-transform: uppercase;">
+            <div style="flex:1.5;">Tên Món Quà</div>
+            <div style="flex:1.5; text-align:center;">Hình Ảnh</div>
+            <div style="flex:0.6; text-align:center;">SL Tồn</div>
+            <div id="col-mul" style="flex:1; text-align:center; color:#0054a6; display: none;">Bội số</div>
+            <div id="col-pct" style="flex:1; text-align:center; color:#e84393; display: block;">Tỉ lệ (%)</div>
+            <div style="flex:0.3;"></div>
+        </div>
+        
+        <div id="cfg-prizes"></div>
+
+        <div id="lose-rate-container">
+            <i class="fas fa-info-circle"></i> Tỉ lệ rơi vào ô [May mắn lần sau]: <span id="lose-rate-val">0</span>%
+        </div>
+        
+        <div style="display:flex; gap:15px; margin-top:25px;">
+            <button type="button" class="btn" style="background:#17a2b8; width:auto;" onclick="loadDefaultTemplate()"><i class="fas fa-download"></i> Tải Quà Mặc Định</button>
+            <button type="button" class="btn" style="background:#6c757d; width:auto;" onclick="addPrizeRow()"><i class="fas fa-plus-circle"></i> Thêm Quà</button>
+            <button type="button" class="btn" style="background: linear-gradient(135deg, #11998e, #38ef7d); flex:1; font-size:16px;" onclick="saveInventory()"><i class="fas fa-play"></i> LƯU & MỞ TRẠM</button>
+            <button type="button" class="btn" style="background: linear-gradient(135deg, #cb2d3e, #ef473a); width:auto;" onclick="closeSession()"><i class="fas fa-lock"></i> ĐÓNG CA</button>
+        </div>
+    </div>
+
+    <div id="tab-history" class="tab-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap: wrap; gap: 10px;">
+            <div><h3 style="margin:0; color:#0054a6; font-size:18px;"><i class="fas fa-users"></i> DANH SÁCH THÍ SINH TẠI TRẠM: <span id="hist-station-label" style="color:#dc3545; font-weight: 900;"></span></h3></div>
+            <div style="display:flex; gap: 10px;">
+                <select id="hist-location-filter" onchange="window.renderHistory()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #0054a6; color: #0054a6; font-weight: bold; display: none; background: #e8f4fd;"><option value="">-- Tất cả trạm --</option></select>
+                <button type="button" class="btn" style="width:auto; padding:8px 15px; background: linear-gradient(135deg, #8e2de2, #4a00e0);" onclick="grantMission('ALL')"><i class="fas fa-magic"></i> MỞ NHIỆM VỤ CHO TẤT CẢ</button>
+            </div>
+        </div>
+        <div id="hist-list" style="max-height:550px; overflow-y:auto; padding-right: 5px;"></div>
+        <div style="margin-top:20px;"><button type="button" class="btn" style="background: linear-gradient(135deg, #f2994a, #f2c94c); width: 100%; font-size:16px;" onclick="saveWinners()"><i class="fas fa-check-double"></i> CẬP NHẬT TRẠNG THÁI GIAO QUÀ</button></div>
+    </div>
+
+    <div id="tab-report" class="tab-content">
+        <div class="filter-box"><select id="rep-location" onchange="generateReport()"></select><select id="rep-admin" onchange="generateReport()"></select><input type="date" id="rep-date" onchange="generateReport()"></div>
+        <div class="stats-grid"><div class="stat-card card-blue"><i class="fas fa-users icon-bg"></i><div class="title">Tổng Người Trúng</div><h3 id="rep-total">0</h3></div><div class="stat-card card-green"><i class="fas fa-gift icon-bg"></i><div class="title">Quà Đã Giao</div><h3 id="rep-given">0</h3></div><div class="stat-card card-orange"><i class="fas fa-hand-holding-heart icon-bg"></i><div class="title">Quà Chưa Giao</div><h3 id="rep-not-given">0</h3></div></div>
+        <div style="background:#fff; border:1px solid #e1e8ed; border-radius:15px; padding:20px; margin-top:25px;">
+            <h3 style="margin:0 0 15px 0; color:#0054a6; font-size:18px;"><i class="fas fa-chart-pie"></i> SỐ LƯỢNG QUÀ TẶNG (CÁC TRẠM ĐÃ CHỐT)</h3>
+            <div style="overflow-x:auto; border: 1px solid #e1e8ed; border-radius: 10px;"><table class="data-table"><thead><tr><th>Địa Điểm</th><th>Người Trực</th><th>Tên Quà Tặng</th><th>Tổng Đem Đi</th><th>Đã Trúng</th><th>Đã Trao</th><th>Tồn Về</th></tr></thead><tbody id="report-detail-tbody"></tbody></table></div>
+            <div style="text-align: right; margin-top: 15px;"><button type="button" id="btn-reset-stations" class="btn" style="background: #dc3545; display: none; width: auto; font-size: 13px; padding: 8px 15px; border-radius: 6px; box-shadow: none;" onclick="clearAllStationsConfig()"><i class="fas fa-bomb"></i> Xóa nhanh các Trạm nháp</button></div>
+        </div>
+    </div>
+
+    <div id="tab-data" class="tab-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0; color:#0054a6; font-size:18px;"><i class="fas fa-table"></i> DATA GỐC</h3>
+            <div><button type="button" class="btn" style="width:auto; padding:8px 15px; background: linear-gradient(135deg, #4facfe, #00f2fe); margin-right:10px;" onclick="printData()"><i class="fas fa-print"></i> IN A4</button><button type="button" class="btn" style="width:auto; padding:8px 15px; background: linear-gradient(135deg, #11998e, #38ef7d);" onclick="exportCSV()"><i class="fas fa-file-excel"></i> XUẤT EXCEL</button></div>
+        </div>
+        <div style="overflow-x:auto; max-height:550px; border:1px solid #e1e8ed; border-radius:10px;">
+            <table class="data-table"><thead><tr><th>Hàng</th><th>Thời gian</th><th>SĐT</th><th>Họ Tên</th><th>Trường</th><th>Quà Trúng</th><th>Trạng Thái</th><th>Địa Điểm</th><th>Người Trực</th></tr></thead><tbody id="raw-data-tbody"></tbody></table>
+        </div>
+    </div>
+
+    <div id="tab-accounts" class="tab-content">
+        <div style="background:#fff; border: 1px solid #e1e8ed; border-radius:15px; padding:20px; margin-bottom:20px;">
+            <div style="font-weight:800; display:flex; padding-bottom:15px; font-size:13px; color:#6c757d; text-transform: uppercase; border-bottom: 2px solid #f1f4f8; margin-bottom:15px;"><div style="flex:1.2;">Họ và Tên</div><div style="flex:1;">Tài Khoản</div><div style="flex:1;">Mật Khẩu</div><div style="flex:0.8;">Quyền</div><div style="flex:0.3;"></div></div>
+            <div id="cfg-accounts-list"></div><button type="button" class="btn" style="background:#6c757d; margin-top:15px; width:auto;" onclick="window.addAccountRow()"><i class="fas fa-user-plus"></i> Thêm Nick</button>
+        </div>
+        <button type="button" class="btn" style="background: linear-gradient(135deg, #007bff, #0056b3);" onclick="window.saveAccounts()"><i class="fas fa-save"></i> LƯU DANH SÁCH</button>
+    </div>
+
+    <div id="tab-system" class="tab-content">
+        <div style="background:#fff; border: 1px solid #e1e8ed; border-radius:15px; padding:20px; margin-bottom:20px;">
+            <h3 style="color:#0054a6; border-bottom:2px dashed #eee; padding-bottom:10px; margin-top:0;"><i class="fas fa-link"></i> Cấu Hình Nhiệm Vụ</h3>
+            <div class="sys-row" style="margin-top:10px;">
+                <div style="flex:1;"><label style="font-weight:bold; color:#555; font-size:13px;">Đường link MXH:</label><input type="text" id="sys-mission-link" placeholder="Nhập đường link trang..."></div>
+                <div style="flex:1;"><label style="font-weight:bold; color:#555; font-size:13px;">Dòng chữ hiển thị:</label><input type="text" id="sys-mission-text" placeholder="VD: Like & Share Fanpage TVU"></div>
+                <div style="flex:0.5;"><label style="font-weight:bold; color:#555; font-size:13px;">Tên Icon:</label><select id="sys-mission-icon"><option value="fab fa-facebook">Facebook</option><option value="fab fa-tiktok">Tiktok</option><option value="fas fa-comment-dots">Zalo/Chat</option><option value="fas fa-globe">Website</option></select></div>
+            </div>
+        </div>
+        <div style="background:#fff; border: 1px solid #e1e8ed; border-radius:15px; padding:20px; margin-bottom:20px;">
+            <h3 style="color:#0054a6; border-bottom:2px dashed #eee; padding-bottom:10px; margin-top:0;"><i class="fas fa-box-open"></i> Khuôn Quà Mặc Định</h3>
+            <div style="font-weight: 800; display: flex; padding: 0 15px; color: #6c757d; margin-bottom: 10px; font-size:13px; text-transform: uppercase;"><div style="flex:1.5;">Tên Món Quà</div><div style="flex:1.8; text-align:center;">Hình Ảnh Mặc Định</div><div style="flex:0.3;"></div></div>
+            <div id="sys-default-prizes"></div><button type="button" class="btn" style="background:#6c757d; margin-top:15px; width:auto;" onclick="window.addSysPrizeRow()"><i class="fas fa-plus"></i> Thêm Quà Vào Khuôn</button>
+        </div>
+        <button type="button" class="btn" style="background: linear-gradient(135deg, #11998e, #38ef7d);" onclick="window.saveSystemConfig()"><i class="fas fa-save"></i> LƯU CẤU HÌNH HỆ THỐNG</button>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFvwvjheytoxNtnneWpIsGoHuqpYBreE__bJ3JZdsWW42baeAUzWeFS4yJViQQ2jwORQ/exec";
+    let allData = { stations: {}, history: [], accounts: [], sessions: {}, sysConfig: {} };
+    let currentUser = null;
+
+    function checkSessionAlive() {
+        let sessionUser = localStorage.getItem("tvu_admin_user");
+        let sessionTime = localStorage.getItem("tvu_admin_time");
+        let now = Date.now();
+        if (sessionUser && sessionTime && (now - parseInt(sessionTime) < 15 * 60 * 1000)) {
+            currentUser = JSON.parse(sessionUser); localStorage.setItem("tvu_admin_time", now); return true;
+        }
+        localStorage.removeItem("tvu_admin_user"); localStorage.removeItem("tvu_admin_time"); return false;
+    }
+    
+    window.addEventListener('mousemove', () => { if(currentUser) localStorage.setItem("tvu_admin_time", Date.now()); });
+    window.addEventListener('keypress', () => { if(currentUser) localStorage.setItem("tvu_admin_time", Date.now()); });
+
+    window.api = function(params, cb) {
+        try {
+            const callbackName = 'cb_' + Math.round(Math.random() * 1000000);
+            const script = document.createElement('script');
+            let timeoutId = setTimeout(() => { if (window[callbackName]) { document.body.removeChild(script); delete window[callbackName]; Swal.fire("Lỗi", "Mạng yếu!", "error"); } }, 20000);
+            window[callbackName] = function(data) { clearTimeout(timeoutId); if(script.parentNode) document.body.removeChild(script); delete window[callbackName]; if(data && data.error) Swal.fire("Lỗi", data.error, "error"); else cb(data); };
+            const qs = Object.keys(params).map(k => k + '=' + encodeURIComponent(params[k])).join('&');
+            script.src = SCRIPT_URL + (SCRIPT_URL.indexOf('?') >= 0 ? '&' : '?') + qs + '&callback=' + callbackName + '&t=' + Date.now();
+            document.body.appendChild(script);
+        } catch(e) { alert("Lỗi API: " + e.message); }
+    };
+
+    window.onload = function() {
+        Swal.fire({title: 'Đang tải hệ thống...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+        api({ action: "getAdmin" }, (res) => {
+            Swal.close(); allData = res;
+            if(!allData.stations) allData.stations = {}; if(!allData.accounts) allData.accounts = [];
+            if(!allData.sessions) allData.sessions = {}; if(!allData.sysConfig) allData.sysConfig = {missionLink:"", missionText:"", missionIcon:"", defaultPrizes:[]};
+            if (checkSessionAlive()) { showAdminPanel(); } else { document.getElementById('login-box').style.display = 'block'; }
+        });
+    };
+
+    window.checkLogin = function() { 
+        let u = document.getElementById('username').value.trim(); let p = document.getElementById('password').value.trim(); 
+        let f = allData.accounts.find(a => a.user === u && a.pass === p); 
+        if (f) { currentUser = f; localStorage.setItem("tvu_admin_user", JSON.stringify(f)); localStorage.setItem("tvu_admin_time", Date.now()); showAdminPanel(); } 
+        else Swal.fire("Lỗi", "Thông tin sai!", "error"); 
+    };
+
+    window.logout = function() { localStorage.clear(); location.reload(); };
+
+    function showAdminPanel() {
+        document.getElementById('login-box').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('current-admin-name').innerText = (currentUser.fullName || currentUser.user);
+        
+        let locInput = document.getElementById('cfg-location'); let assignSelect = document.getElementById('cfg-assign-admin');
+        if (currentUser.role === 'super') {
+            document.getElementById('tab-btn-acc').style.display = 'flex'; document.getElementById('tab-btn-sys').style.display = 'flex'; document.getElementById('assign-box').style.display = 'block'; document.getElementById('super-station-list-box').style.display = 'block'; document.getElementById('btn-reset-stations').style.display = 'inline-flex'; document.getElementById('hist-location-filter').style.display = 'inline-block';
+            locInput.readOnly = false;
+            window.renderAccounts(); window.renderSysConfigUI(); 
+            assignSelect.innerHTML = '<option value="' + currentUser.user + '">-- Tự phụ trách --</option>';
+            allData.accounts.forEach(acc => { if(acc.role !== 'super') assignSelect.innerHTML += `<option value="${acc.user}">${acc.fullName || acc.user}</option>`; });
+            let savedSelect = document.getElementById('super-saved-stations'); savedSelect.innerHTML = '<option value="">-- Chọn trạm cũ --</option>';
+            Object.keys(allData.stations).forEach(loc => { savedSelect.innerHTML += `<option value="${loc}">${loc}${allData.stations[loc].isClosed ? " (Đã Chốt)" : ""}</option>`; });
+            window.loadStationByName(allData.sessions[currentUser.user] || "");
+        } else {
+            document.getElementById('assign-box').style.display = 'none'; document.getElementById('super-station-list-box').style.display = 'none'; document.getElementById('btn-reset-stations').style.display = 'none'; document.getElementById('hist-location-filter').style.display = 'none'; locInput.readOnly = true; 
+            window.loadStationByName(allData.sessions[currentUser.user] || "");
+        }
+        window.populateFilters();
+    }
+
+    // ==========================================
+    // 🔥 CẬP NHẬT TỈ LỆ TRƯỢT VÀ CÂN BẰNG PHẦN TRĂM 🔥
+    // ==========================================
+    window.updateLoseRate = function() {
+        let mode = window.getCurrentMode();
+        let loseRateContainer = document.getElementById('lose-rate-container');
+        
+        if (mode.includes('percent')) {
+            loseRateContainer.style.display = 'block';
+            let totalPct = 0;
+            document.querySelectorAll('.p-percent').forEach(el => {
+                totalPct += parseFloat(el.value) || 0;
+            });
+            let loseRate = 100 - totalPct;
+            if (loseRate < 0) loseRate = 0;
+            document.getElementById('lose-rate-val').innerText = loseRate.toFixed(2);
+        } else {
+            loseRateContainer.style.display = 'none';
+        }
+    };
+
+    window.balancePercentages = function(changedInput) {
+        let mode = window.getCurrentMode();
+        if (mode !== 'percent_manual') {
+            window.updateLoseRate();
+            return;
+        }
+
+        let allPctInputs = Array.from(document.querySelectorAll('.p-percent'));
+        let totalOthers = 0;
+        
+        // Không bắt ép điền đủ 100% nữa. Chừa ra làm "May mắn lần sau"
+        allPctInputs.forEach(el => {
+            if (el !== changedInput) totalOthers += (parseFloat(el.value) || 0);
+        });
+
+        let maxAllowed = 100 - totalOthers;
+        if (maxAllowed < 0) maxAllowed = 0;
+
+        let newVal = parseFloat(changedInput.value);
+        if (isNaN(newVal) || newVal < 0) newVal = 0;
+        
+        // Khóa không cho nhập quá mức 100% tổng
+        if (newVal > maxAllowed) {
+            newVal = maxAllowed;
+            changedInput.value = Number.isInteger(newVal) ? newVal : newVal.toFixed(2);
+        }
+
+        // Cập nhật lại thanh tỷ lệ trượt
+        window.updateLoseRate();
+    };
+
+    window.getCurrentMode = function() {
+        let selectedRadio = document.querySelector('input[name="calcType"]:checked');
+        if (!selectedRadio) return 'percent_manual'; 
+        if (selectedRadio.value === 'percent') return document.getElementById('cfg-mode-percent').value;
+        return document.getElementById('cfg-mode-multiplier').value;
+    };
+
+    window.toggleCalcType = function() {
+        let type = document.querySelector('input[name="calcType"]:checked').value;
+        let selPct = document.getElementById('cfg-mode-percent');
+        let selMul = document.getElementById('cfg-mode-multiplier');
+        if (type === 'percent') { selPct.disabled = false; selPct.style.background = '#fff'; selMul.disabled = true; selMul.style.background = '#e9ecef'; } 
+        else { selMul.disabled = false; selMul.style.background = '#fff'; selPct.disabled = true; selPct.style.background = '#e9ecef'; }
+        window.toggleMode();
+    };
+
+    window.toggleMode = function() { 
+        let mode = window.getCurrentMode();
+        let isAuto = mode.includes('auto'); 
+        let isPct = mode.includes('percent');
+        
+        document.getElementById('col-mul').style.display = isPct ? 'none' : 'block';
+        document.getElementById('col-pct').style.display = isPct ? 'block' : 'none';
+
+        document.querySelectorAll('.prize-row').forEach(row => {
+            let mulInput = row.querySelector('.p-mul');
+            let pctInput = row.querySelector('.p-percent');
+            
+            if (isPct) {
+                mulInput.style.display = 'none';
+                pctInput.style.display = 'block';
+                pctInput.readOnly = isAuto;
+                pctInput.style.backgroundColor = isAuto ? '#e9ecef' : '#fff';
+            } else {
+                pctInput.style.display = 'none';
+                mulInput.style.display = 'block';
+                mulInput.readOnly = isAuto;
+                mulInput.style.backgroundColor = isAuto ? '#e9ecef' : '#fff';
+            }
+        }); 
+        if(isAuto) window.calculateAuto(); 
+        window.updateLoseRate();
+    };
+
+    window.calculateAuto = function() { 
+        let mode = window.getCurrentMode();
+        if(!mode.includes('auto')) return; 
+        let exp = parseInt(document.getElementById('cfg-expected').value)||0; 
+        let isPct = mode.includes('percent');
+        
+        document.querySelectorAll('.prize-row').forEach(row => { 
+            let q = parseInt(row.querySelector('.p-qty').value)||0; 
+            let mulInput = row.querySelector('.p-mul');
+            let pctInput = row.querySelector('.p-percent');
+            
+            if (isPct) { pctInput.value = (exp > 0 && q > 0) ? ((q / exp) * 100).toFixed(2) : 0; } 
+            else { mulInput.value = q > 0 ? Math.max(1, Math.floor(exp/q)) : 0; }
+        }); 
+        window.updateLoseRate();
+    };
+
+    // ==========================================
+
+    window.loadStationByName = function(locName) { 
+        document.getElementById('cfg-location').value = locName || ""; 
+        if (!locName) { 
+            document.querySelector('input[name="calcType"][value="percent"]').checked = true;
+            document.getElementById('cfg-mode-percent').value = 'percent_manual';
+            document.getElementById('cfg-mode-multiplier').value = 'manual';
+            window.toggleCalcType();
+            window.renderConfig([]); 
+            return; 
+        } 
+        let st = allData.stations[locName]; 
+        if (st) { 
+            document.getElementById('cfg-expected').value = st.expectedStudents || 500; 
+            let mode = st.calcMode || 'percent_manual'; 
+            if (mode.includes('percent')) {
+                document.querySelector('input[name="calcType"][value="percent"]').checked = true;
+                document.getElementById('cfg-mode-percent').value = mode;
+            } else {
+                document.querySelector('input[name="calcType"][value="multiplier"]').checked = true;
+                document.getElementById('cfg-mode-multiplier').value = mode;
+            }
+            window.toggleCalcType();
+            window.renderConfig(st.rules || []); 
+            if (currentUser.role === 'super') { let assignedUser = currentUser.user; for (let user in allData.sessions) { if (allData.sessions[user] === locName) { assignedUser = user; break; } } document.getElementById('cfg-assign-admin').value = assignedUser; } 
+        } 
+    };
+
+    window.renderConfig = function(rules) { 
+        let html = ''; 
+        let mode = window.getCurrentMode();
+        let isPctMode = mode.includes('percent');
+        
+        rules.forEach((rule, i) => { 
+            let imgSrc = rule.image ? 'upload/image/' + rule.image : 'upload/image/logotvu.png'; 
+            let rateVal = isPctMode ? (rule.percent || 0) : (rule.mul || 0);
+
+            html += `<div class="cfg-row prize-row">
+                <input style="flex:1.5" type="text" class="p-name" value="${rule.name}">
+                <div class="upload-area">
+                    <img id="prev_${i}" src="${imgSrc}" class="img-preview" onerror="this.src='upload/image/logotvu.png'">
+                    <input type="text" class="p-img" value="${rule.image||''}" placeholder="Tên file ảnh" oninput="document.getElementById('prev_${i}').src='upload/image/'+this.value">
+                    <input type="file" style="display:none" onchange="window.uploadFile(this, ${i})">
+                    <button type="button" style="border:none; background:#e9ecef; padding:8px 12px; border-radius:6px; cursor:pointer;" onclick="this.previousElementSibling.click()"><i class="fas fa-upload"></i></button>
+                </div>
+                <input style="flex:0.8" type="number" class="p-qty" value="${rule.qty}" oninput="window.calculateAuto()">
+                <input style="flex:1; color:#0054a6; font-weight:bold; display:none;" type="number" class="p-mul" value="${rule.mul || 0}">
+                <input style="flex:1; color:#e84393; font-weight:bold; display:block;" type="number" step="any" class="p-percent" value="${rule.percent || 0}" oninput="window.balancePercentages(this)">
+                <button style="flex:0.3;" type="button" style="border:none; color:#dc3545; background:rgba(220,53,69,0.1); padding:8px 12px; border-radius:6px; font-size:14px; cursor:pointer;" onclick="this.parentElement.remove(); window.updateLoseRate();"><i class="fas fa-trash-alt"></i></button>
+            </div>`; 
+        }); 
+        document.getElementById('cfg-prizes').innerHTML = html; 
+        window.toggleMode(); 
+    };
+
+    window.addPrizeRow = function() { 
+        let i = document.querySelectorAll('.prize-row').length; 
+        document.getElementById('cfg-prizes').insertAdjacentHTML('beforeend', `<div class="cfg-row prize-row"><input style="flex:1.5" type="text" class="p-name" placeholder="Tên món quà"><div class="upload-area"><img id="prev_${i}" src="upload/image/logotvu.png" class="img-preview"><input type="text" class="p-img" placeholder="Tên file ảnh"><input type="file" style="display:none" onchange="window.uploadFile(this, ${i})"><button type="button" style="border:none; background:#e9ecef; padding:8px 12px; border-radius:6px; cursor:pointer;" onclick="this.previousElementSibling.click()"><i class="fas fa-upload"></i></button></div><input style="flex:0.8" type="number" class="p-qty" value="0" oninput="window.calculateAuto()"><input style="flex:1; color:#0054a6; font-weight:bold; display:none;" type="number" class="p-mul" value="0"><input style="flex:1; color:#e84393; font-weight:bold; display:block;" type="number" step="any" class="p-percent" value="0" oninput="window.balancePercentages(this)"><button style="flex:0.3;" type="button" style="border:none; color:#dc3545; background:rgba(220,53,69,0.1); padding:8px 12px; border-radius:6px; font-size:14px; cursor:pointer;" onclick="this.parentElement.remove(); window.updateLoseRate();"><i class="fas fa-trash-alt"></i></button></div>`); 
+        window.toggleMode();
+    };
+
+    window.saveInventory = function() { 
+        let loc = document.getElementById('cfg-location').value.trim(); if(!loc) return Swal.fire("Lỗi", "Vui lòng nhập Tên Địa Điểm!", "error"); 
+        let assignTo = (currentUser.role === 'super' && document.getElementById('cfg-assign-admin').value) ? document.getElementById('cfg-assign-admin').value : currentUser.user; 
+        let mode = window.getCurrentMode();
+        let isPct = mode.includes('percent');
+        let rules = []; 
+        
+        document.querySelectorAll('.prize-row').forEach(row => { 
+            let nElem = row.querySelector('.p-name'); 
+            if(nElem && nElem.value.trim() !== "") {
+                rules.push({ 
+                    name: nElem.value.trim(), 
+                    image: row.querySelector('.p-img').value.trim() || "", 
+                    qty: parseInt(row.querySelector('.p-qty').value) || 0, 
+                    mul: parseInt(row.querySelector('.p-mul').value) || 0, 
+                    percent: parseFloat(row.querySelector('.p-percent').value) || 0 
+                });
+            }
+        }); 
+        let data = { location: loc, expectedStudents: parseInt(document.getElementById('cfg-expected').value)||500, calcMode: mode, rules: rules, counter: (allData.stations[loc] ? allData.stations[loc].counter : 0) }; 
+        Swal.fire({title: 'Đang lưu...', allowOutsideClick: false, didOpen: () => Swal.showLoading()}); 
+        api({ action: "saveAdmin", data: JSON.stringify(data), adminUser: currentUser.user, assignAdmin: assignTo }, () => location.reload()); 
+    };
+
+    // GIỮ NGUYÊN CÁC HÀM BÊN DƯỚI ...
+    window.populateFilters = function() { let ls = new Set(), as = new Set(); allData.history.forEach(w => { if(w.location) ls.add(w.location); if(w.admin) as.add(w.admin); }); let sL = document.getElementById('rep-location'); sL.innerHTML = '<option value="">- Tất cả Trạm -</option>'; let hL = document.getElementById('hist-location-filter'); hL.innerHTML = '<option value="">- Lọc theo Trạm -</option>'; ls.forEach(l => { sL.innerHTML += `<option value="${l}">${l}</option>`; hL.innerHTML += `<option value="${l}">${l}</option>`; }); let sA = document.getElementById('rep-admin'); sA.innerHTML = '<option value="">- Tất cả Người Trực -</option>'; as.forEach(a => { sA.innerHTML += `<option value="${a}">${a}</option>`; }); };
+    window.renderHistory = function() { let h = ''; let filterLoc = document.getElementById('hist-location-filter').value; let targetStationLabel = ""; if (currentUser.role === 'super') { targetStationLabel = filterLoc ? `[${filterLoc}]` : "[TẤT CẢ TRẠM]"; } else { let myLoc = allData.sessions[currentUser.user] || "Chưa gán trạm"; targetStationLabel = `[${myLoc}]`; filterLoc = myLoc; } document.getElementById('hist-station-label').innerText = targetStationLabel; allData.history.forEach(w => { let canView = false; if (currentUser.role === 'super') { if (!filterLoc || w.location === filterLoc) canView = true; } else { if (w.admin === currentUser.user) canView = true; } if (canView) { let pImg = 'upload/image/logotvu.png'; let prizeText = w.prize; let isWinner = true; if (w.prize === "May mắn lần sau") { prizeText = "Trượt"; isWinner = false; } else if (w.prize === "Chưa có") { prizeText = "Chưa quay"; isWinner = false; } else { if (allData.stations[w.location] && allData.stations[w.location].rules) { let r = allData.stations[w.location].rules.find(rx => rx.name === w.prize); if (r && r.image) pImg = 'upload/image/' + r.image; } } let statusCol = ''; if (isWinner) { let statusColor = w.delivered ? '#28a745' : '#f2994a'; statusCol = `<input type="checkbox" class="cb-delivered" data-row="${w.row}" ${w.delivered?'checked':''} style="width:20px; height:20px; cursor:pointer;"><br><small style="font-weight:800; color:${statusColor};">Phát Quà</small>`; } else { statusCol = `<small style="color:#999;">-</small>`; } let missionBtn = ''; if (w.mission === "completed") { missionBtn = `<button class="btn-mission disabled" disabled><i class="fas fa-check-circle"></i> Đã nhận</button>`; } else if (w.mission === "pending") { missionBtn = `<button class="btn-mission disabled" style="color:#f39c12; border-color:#f39c12;" disabled><i class="fas fa-spinner fa-spin"></i> Chờ NV</button>`; } else { missionBtn = `<button class="btn-mission" onclick="window.grantMission('${w.phone}')"><i class="fas fa-plus"></i> Tặng lượt</button>`; } h += `<div class="winner-row"><div style="display:flex; align-items:center; flex:1;"><div class="winner-img-box"><img src="${pImg}" onerror="this.src='upload/image/logotvu.png'"></div><div><b style="color:#0054a6; font-size:16px;">${w.name}</b> - <i class="fas fa-phone-alt" style="font-size:12px;"></i> ${w.phone} | <i class="fas fa-school" style="font-size:12px;"></i> <span style="color:#e84393; font-weight:bold;">${w.school}</span><br><small style="color:#6c757d;"><i class="fas fa-ticket-alt"></i> Lượt còn: <b>${w.turns}</b> | Trạm: <b>${w.location}</b></small><br><div style="margin-top:5px; display:inline-block; background:rgba(40,167,69,0.1); color:${isWinner?'#28a745':'#6c757d'}; padding:3px 10px; border-radius:20px; font-weight:800; font-size:12px;">Quà: ${prizeText}</div></div></div><div style="display:flex; align-items:center; gap: 15px;"><div style="text-align:center;">${missionBtn}</div><div style="text-align:center; min-width:65px; border-left: 1px dashed #e1e8ed; padding-left:15px;">${statusCol}</div></div></div>`; } }); document.getElementById('hist-list').innerHTML = h || '<div style="text-align:center; color:#999; padding:40px;">Chưa có thí sinh ở trạm này.</div>'; };
+    window.grantMission = function(phoneNum) { let filterLoc = document.getElementById('hist-location-filter').value; if (phoneNum === 'ALL' && currentUser.role === 'super' && !filterLoc) { return Swal.fire("Lưu ý", "SuperAdmin vui lòng 'Lọc theo Trạm' cụ thể trước khi bấm Mở khóa nhiệm vụ cho tất cả!", "warning"); } let msg = phoneNum === 'ALL' ? "Mở khóa nhiệm vụ cho TẤT CẢ thí sinh ở trạm này?" : "Mở khóa nhiệm vụ cho SĐT " + phoneNum + "?"; Swal.fire({ title: 'Tặng thêm lượt', text: msg, icon: 'info', showCancelButton: true, confirmButtonText: 'Đồng ý' }).then((result) => { if (result.isConfirmed) { Swal.fire({title: 'Đang xử lý...', allowOutsideClick: false, didOpen: () => Swal.showLoading()}); let adminToPass = currentUser.user; if(phoneNum === 'ALL' && currentUser.role === 'super') { for(let u in allData.sessions) { if(allData.sessions[u] === filterLoc) { adminToPass = u; break;} } } api({ action: "enableMission", targetPhone: phoneNum, adminUser: adminToPass }, () => { Swal.fire("Thành công!", "Đã mở khóa nhiệm vụ.", "success").then(() => location.reload()); }); } }); };
+    window.renderSysConfigUI = function() { let sc = allData.sysConfig; document.getElementById('sys-mission-link').value = sc.missionLink || ""; document.getElementById('sys-mission-text').value = sc.missionText || ""; document.getElementById('sys-mission-icon').value = sc.missionIcon || "fab fa-facebook"; let html = ''; if (sc.defaultPrizes) { sc.defaultPrizes.forEach((rule, i) => { let imgSrc = rule.image ? 'upload/image/' + rule.image : 'upload/image/logotvu.png'; html += `<div class="cfg-row sys-prize-row"><input style="flex:1.5" type="text" class="sp-name" value="${rule.name}"><div class="upload-area"><img id="sprev_${i}" src="${imgSrc}" class="img-preview" onerror="this.src='upload/image/logotvu.png'"><input type="text" class="sp-img" value="${rule.image||''}" placeholder="Tên file ảnh" oninput="document.getElementById('sprev_${i}').src='upload/image/'+this.value"><input type="file" style="display:none" onchange="window.uploadSysFile(this, ${i})"><button type="button" style="border:none; background:#e9ecef; padding:8px 12px; border-radius:6px; cursor:pointer;" onclick="this.previousElementSibling.click()"><i class="fas fa-upload"></i></button></div><button type="button" style="border:none; color:#dc3545; background:rgba(220,53,69,0.1); padding:8px 12px; border-radius:6px; font-size:14px; cursor:pointer;" onclick="this.parentElement.remove()"><i class="fas fa-trash-alt"></i></button></div>`; }); } document.getElementById('sys-default-prizes').innerHTML = html; };
+    window.addSysPrizeRow = function() { let i = document.querySelectorAll('.sys-prize-row').length; document.getElementById('sys-default-prizes').insertAdjacentHTML('beforeend', `<div class="cfg-row sys-prize-row"><input style="flex:1.5" type="text" class="sp-name" placeholder="Tên món quà"><div class="upload-area"><img id="sprev_${i}" src="upload/image/logotvu.png" class="img-preview"><input type="text" class="sp-img" placeholder="Tên file ảnh" value="logotvu.png"><input type="file" style="display:none" onchange="window.uploadSysFile(this, ${i})"><button type="button" style="border:none; background:#e9ecef; padding:8px 12px; border-radius:6px; cursor:pointer;" onclick="this.previousElementSibling.click()"><i class="fas fa-upload"></i></button></div><button type="button" style="border:none; color:#dc3545; background:rgba(220,53,69,0.1); padding:8px 12px; border-radius:6px; font-size:14px; cursor:pointer;" onclick="this.parentElement.remove()"><i class="fas fa-trash-alt"></i></button></div>`); };
+    window.saveSystemConfig = function() { try { let mLink = document.getElementById('sys-mission-link').value.trim(); let mText = document.getElementById('sys-mission-text').value.trim(); let mIcon = document.getElementById('sys-mission-icon').value; let dPrizes = []; document.querySelectorAll('.sys-prize-row').forEach(row => { let nElem = row.querySelector('.sp-name').value.trim(); let imgElem = row.querySelector('.sp-img').value.trim() || 'logotvu.png'; if(nElem) dPrizes.push({name: nElem, image: imgElem, qty: 0, mul: 0, percent: 0}); }); let sysData = { missionLink: mLink, missionText: mText, missionIcon: mIcon, defaultPrizes: dPrizes }; Swal.fire({title: 'Đang lưu...', didOpen: () => Swal.showLoading()}); api({ action: "saveSystemConfig", sysConfigData: JSON.stringify(sysData) }, () => { allData.sysConfig = sysData; Swal.fire("Thành công!", "Đã lưu cấu hình.", "success"); }); } catch(e) { alert(e.message); } };
+    window.loadDefaultTemplate = function() { Swal.fire({ title: 'Tải Khuôn Mặc Định?', text: "Thao tác này sẽ thay thế danh sách quà hiện tại. Bạn có chắc không?", icon: 'info', showCancelButton: true, confirmButtonText: 'Đồng ý Tải' }).then((result) => { if (result.isConfirmed) { if(allData.sysConfig && allData.sysConfig.defaultPrizes) { window.renderConfig(allData.sysConfig.defaultPrizes); Swal.fire("Đã tải!", "Vui lòng nhập số lượng và tỉ lệ rồi bấm LƯU & MỞ TRẠM.", "success"); } else { Swal.fire("Lỗi", "Chưa có cấu hình mặc định.", "error"); } } }); };
+    window.uploadSysFile = function(input, idx) { if (!input.files[0]) return; let fd = new FormData(); fd.append("file", input.files[0]); Swal.fire({title: 'Đang tải lên...', didOpen: () => Swal.showLoading()}); fetch('upload.php', { method: 'POST', body: fd }).then(r => r.json()).then(d => { if (d.status === 'success') { Swal.fire({icon: 'success', title: 'Thành công', timer: 1000, showConfirmButton: false}); let row = input.parentElement.parentElement; row.querySelector(row.classList.contains('sys-prize-row')?'.sp-img':'.p-img').value = d.filename; row.querySelector('.img-preview').src = 'upload/image/' + d.filename + '?t=' + Date.now(); } else Swal.fire("Lỗi", d.message, "error"); }).catch(() => Swal.fire("Lưu ý", "Không tải được file", "warning")); };
+    window.addAccountRow = function() { document.getElementById('cfg-accounts-list').insertAdjacentHTML('beforeend', `<div class="cfg-row acc-row"><input style="flex:1.2" type="text" class="a-fn" placeholder="Họ tên thật"><input style="flex:1" type="text" class="a-u" placeholder="Tên đăng nhập"><input style="flex:1" type="text" class="a-p" placeholder="Mật khẩu"><select style="flex:0.8" class="a-r"><option value="admin">Trạm Viên</option><option value="super">Tổng Quản</option></select><div style="flex:0.3; text-align:center;"><button type="button" style="border:none; color:#dc3545; background:rgba(220,53,69,0.1); padding:6px 10px; border-radius:6px; cursor:pointer;" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-trash"></i></button></div></div>`); };
+    window.renderAccounts = function() { let html = ''; allData.accounts.forEach((acc, i) => { html += `<div class="cfg-row acc-row"><input style="flex:1.2" type="text" class="a-fn" value="${acc.fullName||''}" placeholder="Họ tên thật"><input style="flex:1" type="text" class="a-u" value="${acc.user}" ${acc.user==='superadmin'?'readonly':''} placeholder="Tên đăng nhập"><input style="flex:1" type="text" class="a-p" value="${acc.pass}" placeholder="Mật khẩu"><select style="flex:0.8" class="a-r"><option value="admin" ${acc.role==='admin'?'selected':''}>Trạm Viên</option><option value="super" ${acc.role==='super'?'selected':''}>Tổng Quản</option></select><div style="flex:0.3; text-align:center;">${acc.user==='superadmin'?'':`<button type="button" style="border:none; color:#dc3545; background:rgba(220,53,69,0.1); padding:6px 10px; border-radius:6px; cursor:pointer;" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-trash"></i></button>`}</div></div>`; }); document.getElementById('cfg-accounts-list').innerHTML = html; };
+    window.saveAccounts = function() { try { let accs = []; document.querySelectorAll('.acc-row').forEach(row => { let uElem = row.querySelector('.a-u'); if (uElem && uElem.value.trim() !== "") { let fn = row.querySelector('.a-fn') ? row.querySelector('.a-fn').value.trim() : ""; let p = row.querySelector('.a-p') ? row.querySelector('.a-p').value.trim() : ""; let r = row.querySelector('.a-r') ? row.querySelector('.a-r').value : "admin"; accs.push({ fullName: fn, user: uElem.value.trim(), pass: p, role: r }); } }); let hasSuper = false; for(let i=0; i<accs.length; i++) { if(accs[i].user === 'superadmin') hasSuper = true; } if(!hasSuper) { accs.unshift({ user: 'superadmin', pass: 'tvu@2026', role: 'super', fullName: 'Admin Tổng' }); } Swal.fire({title: 'Đang lưu...', didOpen: () => Swal.showLoading()}); api({ action: "saveAdmin", accounts: JSON.stringify(accs) }, () => { Swal.fire("Thành công!", "Đã cập nhật.", "success").then(()=>location.reload()); }); } catch(e) { alert(e.message); } };
+    window.saveWinners = function() { let d = []; document.querySelectorAll('.cb-delivered').forEach(cb => d.push({row: cb.dataset.row, delivered: cb.checked})); api({ action: "saveWinners", data: JSON.stringify(d) }, () => Swal.fire("Thành công!", "Đã lưu trạng thái phát quà!", "success")); };
+    window.openTab = function(tabId, btn) { document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active')); document.getElementById(tabId).classList.add('active'); btn.classList.add('active'); if(tabId === 'tab-history') window.renderHistory(); if(tabId === 'tab-report') window.generateReport(); if(tabId === 'tab-data') window.renderRawData(); };
+    window.closeSession = function() { Swal.fire({title: "Bạn chắc chắn Đóng Ca?", icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: "Đóng ca"}).then(r => { if(r.isConfirmed) { let assignElem = document.getElementById('cfg-assign-admin'); let targetAdmin = (assignElem && assignElem.style.display !== 'none' && assignElem.value) ? assignElem.value : currentUser.user; Swal.fire({title: 'Đang chốt sổ...', didOpen: () => Swal.showLoading()}); api({ action: "saveAdmin", closeAdmin: targetAdmin }, () => location.reload()); } }); };
+    window.clearAllStationsConfig = function() { Swal.fire({ title: 'XÁC NHẬN BẢO MẬT KHẨN CẤP', html: 'Hành động này sẽ <b>XÓA SẠCH TOÀN BỘ</b> các Địa Điểm đã tạo trong kho.<br><br>Vui lòng <b>nhập mật khẩu của bạn</b> để tiếp tục:', input: 'password', inputAttributes: { autocapitalize: 'off', autocorrect: 'off', placeholder: 'Nhập mật khẩu Admin Tổng...' }, icon: 'error', showCancelButton: true, confirmButtonText: 'Xác Nhận XÓA TẤT CẢ', cancelButtonText: 'Hủy Bỏ', confirmButtonColor: '#dc3545', preConfirm: (password) => { if (password !== currentUser.pass) { Swal.showValidationMessage('Mật khẩu không chính xác!'); } } }).then((result) => { if (result.isConfirmed) { Swal.fire({title: 'Đang xóa sạch dữ liệu trạm...', allowOutsideClick: false, didOpen: () => Swal.showLoading()}); api({ action: "clearAllStations", adminUser: currentUser.user }, (res) => { Swal.fire("Đã Xóa Kho!", "Toàn bộ cấu hình trạm đã được khôi phục về trạng thái trống.", "success").then(() => location.reload()); }); } }); };
+    window.printData = function() { let dataToPrint = allData.history.filter(row => { if (currentUser.role !== 'super' && row.admin !== currentUser.user) return false; if (row.prize === 'May mắn lần sau' || row.prize === 'Chưa có') return false; return true; }); if(dataToPrint.length === 0) return Swal.fire("Thông báo", "Chưa có người trúng thưởng để in!", "info"); let printWindow = window.open('', '_blank'); let html = `<!DOCTYPE html><html><head><title>Bảng Kê Phát Quà - TVU</title><style>@page { size: A4 landscape; margin: 15mm; } body { font-family: 'Segoe UI', Arial, sans-serif; color: #2c3e50; line-height: 1.5; margin: 0; } * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; print-color-adjust: exact !important; } .header-container { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #0054a6; padding-bottom: 15px; margin-bottom: 25px; } .header-title { text-transform: uppercase; color: #0054a6; margin: 0; font-size: 24px; font-weight: 800; } .header-sub { color: #6c757d; font-size: 14px; margin-top: 5px; } table { width: 100%; border-collapse: collapse; font-size: 13px; } th { background-color: #0054a6; color: #ffffff; font-weight: bold; text-transform: uppercase; padding: 12px 8px; border: 1px solid #004080; text-align: center; } td { border: 1px solid #dce1e6; padding: 10px 8px; vertical-align: middle; } tr:nth-child(even) td { background-color: #f8f9fa; } .text-center { text-align: center; } .fw-bold { font-weight: bold; } .text-primary { color: #0054a6; } .badge { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block; text-align: center; min-width: 70px;} .bg-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; } .bg-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; } .footer-sig { display: flex; justify-content: space-between; margin-top: 40px; font-size: 14px; page-break-inside: avoid; } .sig-box { text-align: center; width: 250px; }</style></head><body><div class="header-container"><div><h2 class="header-title">BẢNG KÊ PHÁT QUÀ SỰ KIỆN</h2><div class="header-sub">Hệ thống Quản trị Vòng Quay TVU</div></div><div style="text-align: right; color: #555; font-size: 13px;"><div>Ngày in: <b style="color:#000;">${new Date().toLocaleDateString('vi-VN')}</b></div><div>Người lập: <b style="color:#000;">${currentUser.fullName || currentUser.user}</b></div></div></div><table><thead><tr><th width="5%">STT</th><th width="12%">Thời Gian Trúng</th><th width="12%">Số Điện Thoại</th><th width="18%">Họ Tên Thí Sinh</th><th width="15%">Trường THPT</th><th width="12%">Địa Điểm</th><th width="15%">Tên Quà Tặng</th><th width="11%">Ký Nhận</th></tr></thead><tbody>`; let count = 1; dataToPrint.forEach(row => { let timeStr = row.time ? new Date(row.time).toLocaleString('vi-VN', {hour: '2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'}) : ""; let statusBadge = row.delivered ? `<span class="badge bg-success">Đã Trao</span>` : `<span class="badge bg-warning">Chưa Trao</span>`; html += `<tr><td class="text-center fw-bold">${count++}</td><td class="text-center">${timeStr}</td><td class="text-center fw-bold">${row.phone}</td><td class="text-primary fw-bold">${row.name}</td><td>${row.school}</td><td>${row.location}</td><td class="fw-bold" style="color:#d35400;">${row.prize}</td><td class="text-center">${statusBadge}</td></tr>`; }); html += `</tbody></table><div class="footer-sig"><div class="sig-box"><strong>ĐẠI DIỆN TRẠM CHÍNH</strong><br><i>(Ký và ghi rõ họ tên)</i></div><div class="sig-box"><strong>NGƯỜI LẬP BẢNG KÊ</strong><br><i>(Ký và ghi rõ họ tên)</i></div></div></body></html>`; printWindow.document.write(html); printWindow.document.close(); setTimeout(() => { printWindow.print(); }, 500); };
+    window.exportCSV = function() { let csv = "data:text/csv;charset=utf-8,\uFEFFHàng,Thời Gian,Số Điện Thoại,Họ Tên,Trường,Địa Điểm,Nhân Viên Trực,Quà Trúng,Trạng Thái\n"; allData.history.forEach(row => { if (currentUser.role !== 'super' && row.admin !== currentUser.user) return; let status = row.delivered ? "Đã trao" : (row.prize === 'May mắn lần sau' ? "-" : "Chưa trao"); let timeStr = row.time ? new Date(row.time).toLocaleString('vi-VN') : ""; csv += `"${row.row}","${timeStr}","'${row.phone}","${row.name}","${row.school}","${row.location}","${row.admin}","${row.prize}","${status}"\n`; }); const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv)); link.setAttribute("download", "DanhSach_VongQuay.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); };
+    window.generateReport = function() { let l = document.getElementById('rep-location').value, a = document.getElementById('rep-admin').value, d = document.getElementById('rep-date').value; let tWin = 0, tGiven = 0; let allTimeWonCount = {}; allData.history.forEach(w => { if(w.prize && w.prize !== "May mắn lần sau" && w.prize !== "Chưa có") { let k = w.location + '|||' + w.prize; allTimeWonCount[k] = (allTimeWonCount[k] || 0) + 1; } }); let statsMap = {}; for (let loc in allData.stations) { let st = allData.stations[loc]; if (st && st.isClosed === true) { if (l && loc !== l) continue; let adminUser = st.closedBy || st.admin; if (!adminUser) { let hRow = allData.history.find(w => w.location === loc); if (hRow) adminUser = hRow.admin; } adminUser = adminUser || "Không rõ"; let accInfo = allData.accounts.find(acc => acc.user === adminUser); let adminFullName = accInfo ? (accInfo.fullName || adminUser) : adminUser; if (st.rules) { st.rules.forEach(r => { let k = loc + '|||' + r.name; statsMap[k] = { loc: loc, admin: adminFullName, name: r.name, ton: parseInt(r.qty)||0, tongDemDi: (parseInt(r.qty)||0) + (allTimeWonCount[k] || 0), daTrung: 0, daGiao: 0 }; }); } } } allData.history.forEach(w => { if (currentUser.role !== 'super' && w.admin !== currentUser.user) return; let st = allData.stations[w.location]; if (!st || st.isClosed !== true) return; let date = w.time ? new Date(w.time).toISOString().split('T')[0] : ""; if ((!l || w.location === l) && (!a || w.admin === a) && (!d || date === d)) { if(w.prize && w.prize !== "May mắn lần sau" && w.prize !== "Chưa có") { tWin++; if(w.delivered) tGiven++; let k = w.location + '|||' + w.prize; if(statsMap[k]) { statsMap[k].daTrung++; if(w.delivered) statsMap[k].daGiao++; } } } }); document.getElementById('rep-total').innerText = tWin; document.getElementById('rep-given').innerText = tGiven; document.getElementById('rep-not-given').innerText = tWin - tGiven; let htmlDetail = ''; for (let key in statsMap) { let item = statsMap[key]; if (item.tongDemDi > 0 || item.daTrung > 0) { htmlDetail += `<tr><td><b>${item.loc}</b></td><td><span style="color:#e84393; font-weight:bold;">${item.admin}</span></td><td><span class="badge bg-info">${item.name}</span></td><td style="font-weight:bold;">${item.tongDemDi}</td><td><span class="badge bg-warning">${item.daTrung}</span></td><td><span class="badge bg-success">${item.daGiao}</span></td><td><span class="badge bg-secondary">${item.ton}</span></td></tr>`; } } document.getElementById('report-detail-tbody').innerHTML = htmlDetail || '<tr><td colspan="7" style="text-align:center;">Trạm chưa chốt sổ.</td></tr>'; };
+    window.renderRawData = function() { let html = ''; allData.history.forEach((w, index) => { if (currentUser.role !== 'super' && w.admin !== currentUser.user) return; let st = allData.stations[w.location]; let isClosedText = (st && st.isClosed) ? '<i class="fas fa-lock" style="color:red;" title="Đã Chốt"></i> ' : '<i class="fas fa-spinner fa-spin" style="color:green;" title="Đang chạy"></i> '; let statusBadge = w.delivered ? '<span class="badge bg-success">Đã Trao</span>' : (w.prize !== 'May mắn lần sau' && w.prize !== 'Chưa có' ? '<span class="badge bg-warning">Chưa Trao</span>' : '<span class="badge bg-secondary">-</span>'); let prizeStr = w.prize === 'May mắn lần sau' ? 'Trượt' : w.prize; let timeStr = new Date(w.time).toLocaleString('vi-VN'); html += `<tr><td>${w.row}</td><td>${timeStr}</td><td>${w.phone}</td><td><b>${w.name}</b></td><td>${w.school}</td><td><span style="color:#0054a6; font-weight:bold;">${prizeStr}</span></td><td>${statusBadge}</td><td>${isClosedText} ${w.location}</td><td>${w.admin}</td></tr>`; }); document.getElementById('raw-data-tbody').innerHTML = html || '<tr><td colspan="9" style="text-align:center;">Chưa có dữ liệu.</td></tr>'; };
+
+</script>
+</body>
+</html>
