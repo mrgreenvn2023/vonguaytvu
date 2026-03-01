@@ -12,7 +12,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
         
         :root { --blue: #0054a6; --cyan: #00d4ff; }
-        body, html { margin: 0; padding: 0; font-family: 'Nunito', sans-serif; min-height: 100vh; background: url('image/tvubg.jpg') center center / cover no-repeat fixed; }
+        body, html { margin: 0; padding: 0; font-family: 'Nunito', sans-serif; min-height: 100vh; background: url('upload/image/tvubg.jpg') center center / cover no-repeat fixed; }
         
         .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 11, 26, 0.75); z-index: 0; }
         #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 1; }
@@ -53,9 +53,7 @@
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(142,45,226,0.7); } 70% { box-shadow: 0 0 0 10px rgba(142,45,226,0); } 100% { box-shadow: 0 0 0 0 rgba(142,45,226,0); } }
 
         #wheel-wrapper { position: relative; width: 280px; height: 280px; margin: 15px auto; }
-        /* Xóa bỏ hiệu ứng transition cũ ở CSS để điều khiển toàn bộ bằng Javascript */
         canvas { width: 100%; height: 100%; border-radius: 50%; box-sizing: border-box; }
-        
         #pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-top: 30px solid #dc3545; z-index: 100; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.3));}
         
         @keyframes prizeDance { 0% { transform: scale(0.8) translateY(0); } 25% { transform: scale(1.1) translateY(-10px) rotate(5deg); } 50% { transform: scale(1.0) translateY(0) rotate(-5deg); } 75% { transform: scale(1.1) translateY(-5px) rotate(3deg); } 100% { transform: scale(1) translateY(0) rotate(0); } }
@@ -80,25 +78,22 @@
 <div class="main-container">
     <div class="card">
         <div class="brand-header">
-            <img src="image/logotvu.png" alt="Logo TVU" class="tvu-logo" onerror="this.style.display='none'">
+            <img src="upload/image/logotvu.png" alt="Logo TVU" class="tvu-logo" onerror="this.style.display='none'">
             <h3 class="event-title">VÒNG QUAY MAY MẮN</h3>
         </div>
         
         <div id="auth-box">
             <select id="user-location" onchange="loadStationConfig()"><option value="">-- CHỌN ĐỊA ĐIỂM SỰ KIỆN (*) --</option></select>
-            <input type="tel" id="phone" placeholder="Số Điện Thoại (*)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <input type="tel" id="phone" placeholder="Số điện thoại cá nhân (*)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             <input type="text" id="name" placeholder="Họ và tên (*)">
             <input type="text" id="school" placeholder="Trường THPT (*)">
             <button class="btn-spin" style="background: linear-gradient(135deg, #0054a6, #00a8ff);" onclick="handleAuth()"><i class="fas fa-sign-in-alt"></i> ĐĂNG KÝ VÀO TRẠM</button>
         </div>
 
         <div id="game-box" style="display:none">
-            <button class="btn-exit-small" onclick="logoutContestant()"><i class="fas fa-sign-out-alt"></i> Thoát</button>
-            
+            <button class="btn-exit-small" onclick="logoutContestant()"><i class="fas fa-sign-out-alt"></i> Thoát Trạm</button>
             <div class="user-panel" id="user-profile-top"></div>
-            
             <div id="wheel-wrapper"><div id="pointer"></div><canvas id="wheel"></canvas></div>
-            
             <div id="user-turns-bottom" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding:10px; background:#fff; border-radius:10px; border:1px solid #dce1e6;"></div>
 
             <div id="mission-box" class="mission-box" onclick="doMission()">
@@ -108,7 +103,6 @@
             </div>
 
             <button id="spin-btn" class="btn-spin" onclick="startSpin()"><i class="fas fa-play"></i> QUAY NGAY</button>
-
             <div id="user-history-bottom"></div>
         </div>
     </div>
@@ -124,15 +118,9 @@
     let systemMissionLink = "https://www.facebook.com/TraVinhUniversity.TVU"; 
     const baseColors = ['#808285', '#0054a6', '#00d4ff', '#28a745', '#f39c12', '#9b59b6', '#e84393', '#ed1c24'];
     
-    // Biến lưu trạng thái Idle Spin
-    let isIdle = false;
-    let idleReq;
+    let isIdle = false; let idleReq;
 
-    particlesJS("particles-js", {
-        "particles": { "number": { "value": 80, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#00d4ff" }, "shape": { "type": "circle" }, "size": { "value": 2.5, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#00d4ff", "opacity": 0.5, "width": 1 }, "move": { "enable": true, "speed": 1.2 } },
-        "interact": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" }, "resize": true }, "modes": { "grab": { "distance": 150, "line_linked": { "opacity": 1 } } } },
-        "retina_detect": true
-    });
+    particlesJS("particles-js", { "particles": { "number": { "value": 80, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#00d4ff" }, "shape": { "type": "circle" }, "size": { "value": 2.5, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#00d4ff", "opacity": 0.5, "width": 1 }, "move": { "enable": true, "speed": 1.2 } }, "interact": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" }, "resize": true }, "modes": { "grab": { "distance": 150, "line_linked": { "opacity": 1 } } } }, "retina_detect": true });
 
     function api(params, cb) {
         try {
@@ -146,25 +134,18 @@
         } catch(e) {}
     }
 
-    // 🔥 HÀM BẬT CHẾ ĐỘ QUAY CHẬM (IDLE) 🔥
     function startIdleSpin() {
         if (spinning || isIdle) return;
         isIdle = true;
-        document.getElementById('wheel').style.transition = 'none'; // Tắt transition để xoay mượt bằng JS
+        document.getElementById('wheel').style.transition = 'none'; 
         function step() {
-            if (!isIdle) return;
-            rotation += 0.4; // Tốc độ quay chậm đều đặn (0.4 độ / frame)
+            if (!isIdle) return; rotation += 0.4; 
             document.getElementById('wheel').style.transform = `rotate(${rotation}deg)`;
             idleReq = requestAnimationFrame(step);
         }
         idleReq = requestAnimationFrame(step);
     }
-
-    // 🔥 HÀM TẮT CHẾ ĐỘ QUAY CHẬM 🔥
-    function stopIdleSpin() {
-        isIdle = false;
-        cancelAnimationFrame(idleReq);
-    }
+    function stopIdleSpin() { isIdle = false; cancelAnimationFrame(idleReq); }
 
     window.onload = function() {
         api({ action: "getConfig" }, (res) => {
@@ -193,7 +174,7 @@
         api({ action: "getConfig", location: loc }, (res) => {
             dynamicPrizes = res.prizes; dynamicImages = res.images; colors = dynamicPrizes.map((p, i) => baseColors[i % baseColors.length]); 
             draw();
-            startIdleSpin(); // Bắt đầu quay chậm ngay sau khi vẽ xong bánh xe
+            startIdleSpin(); 
         });
     }
 
@@ -218,12 +199,10 @@
                 </div>
             </div>
         `;
-        
         document.getElementById('user-turns-bottom').innerHTML = `
             <div><i class="fas fa-ticket-alt" style="color:#f39c12"></i> Lượt quay: <span style="color:red; font-size:18px; font-weight:900;">${user.turns}</span></div>
             <button onclick="forceSync()" style="background:none; border:none; color:#0054a6; font-size:13px; font-weight:bold; cursor:pointer; padding:0; text-decoration:underline;"><i class="fas fa-sync-alt"></i> Cập nhật</button>
         `;
-
         document.getElementById('spin-btn').disabled = (user.turns <= 0);
         document.getElementById('mission-box').style.display = (user.mission === 'pending') ? 'block' : 'none';
 
@@ -236,13 +215,8 @@
                 let pColor = h.prize === 'May mắn lần sau' ? '#6c757d' : '#dc3545';
                 let pText = h.prize === 'May mắn lần sau' ? 'Trượt' : h.prize;
                 histHtml += `
-                <div class="history-item">
-                    <div class="history-time"><i class="far fa-clock"></i> ${d}</div>
-                    <div class="history-detail">
-                        <span class="history-loc"><i class="fas fa-map-marker-alt" style="color:#11998e;"></i> ${h.location}</span>
-                        <span class="history-prize" style="color:${pColor};">${pText}</span>
-                    </div>
-                </div>`;
+                <div class="history-item"><div class="history-time"><i class="far fa-clock"></i> ${d}</div>
+                <div class="history-detail"><span class="history-loc"><i class="fas fa-map-marker-alt" style="color:#11998e;"></i> ${h.location}</span><span class="history-prize" style="color:${pColor};">${pText}</span></div></div>`;
             });
             histHtml += `</div>`;
         } else {
@@ -255,9 +229,18 @@
 
     function handleAuth() {
         let locSelect = document.getElementById('user-location'); let loc = locSelect.value;
-        let ph = document.getElementById('phone').value.trim(); let n = document.getElementById('name').value.trim(); let s = document.getElementById('school').value.trim();
+        let ph = document.getElementById('phone').value.trim(); 
+        let n = document.getElementById('name').value.trim(); 
+        let s = document.getElementById('school').value.trim();
+        
         if (!loc) { if (locSelect.options.length <= 1 && locSelect.options[0].text.includes("chưa có trạm")) return Swal.fire("Thông báo", "Hiện chưa có Trạm mở. Vui lòng quay lại sau!", "warning"); return Swal.fire("Lỗi", "Vui lòng CHỌN ĐỊA ĐIỂM!", "error"); }
-        if (!ph || ph.length !== 10) return Swal.fire("Lỗi", "Số điện thoại phải đúng 10 số!", "error");
+        
+        // 🔥 RÀNG BUỘC ĐỊNH DẠNG SỐ ĐIỆN THOẠI CHUẨN VIỆT NAM 🔥
+        const phoneRegex = /^(03|05|07|08|09)[0-9]{8}$/;
+        if (!phoneRegex.test(ph)) {
+            return Swal.fire("Lỗi Xác Thực", "Số điện thoại không hợp lệ!<br>Vui lòng nhập đúng số thật có 10 chữ số (Ví dụ: <b>09</b>xxxx, <b>03</b>xxxx...)", "error");
+        }
+        
         if (!n || !s) return Swal.fire("Lỗi", "Vui lòng nhập đủ Họ Tên và Trường!", "error");
         
         Swal.fire({title: 'Đang ghi danh...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
@@ -321,19 +304,12 @@
 
     function startSpin() {
         if(spinning || user.turns <= 0) return; 
-        spinning = true; 
-        
-        // 1. Tạm dừng hiệu ứng quay chậm
-        stopIdleSpin();
+        spinning = true; stopIdleSpin();
 
         Swal.fire({title: 'Đang tạo mã quay...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
         api({ action: "spin", phone: user.phone }, (res) => {
             Swal.close();
-            if(res.error) { 
-                spinning = false; 
-                startIdleSpin(); // Có lỗi thì cho quay chậm lại
-                return Swal.fire("Lỗi", res.error, "error"); 
-            }
+            if(res.error) { spinning = false; startIdleSpin(); return Swal.fire("Lỗi", res.error, "error"); }
             
             user.turns--; renderUser(); 
             let winA = document.getElementById('winSound'); let loseA = document.getElementById('loseSound'); let tickA = document.getElementById('tickSound');
@@ -342,18 +318,13 @@
             let winIdx = dynamicPrizes.indexOf(res.prize); if(winIdx === -1) winIdx = 0; 
             const slice = 360 / dynamicPrizes.length;
             
-            // 2. Tính toán chính xác góc quay mới dựa trên góc đang quay chậm hiện tại
             let currentMod = rotation % 360;
             let targetAngle = 270 - (winIdx * slice + slice / 2) + (Math.floor(Math.random() * 20) - 10);
-            targetAngle = (targetAngle % 360 + 360) % 360; // Đảm bảo góc luôn dương
-            let diff = targetAngle - currentMod;
-            if (diff < 0) diff += 360;
+            targetAngle = (targetAngle % 360 + 360) % 360; 
+            let diff = targetAngle - currentMod; if (diff < 0) diff += 360;
             
-            // Cộng thêm 8 vòng xoay siêu tốc
             rotation += (360 * 8) + diff;
-            
             let wheel = document.getElementById('wheel');
-            // Cấp lại hiệu ứng xoay mượt 5 giây của CSS
             wheel.style.transition = 'transform 5s cubic-bezier(0.2, 0, 0.1, 1)';
             wheel.style.transform = `rotate(${rotation}deg)`;
             
@@ -366,13 +337,19 @@
                     Swal.fire("RẤT TIẾC!", "Trượt rồi, chúc bạn may mắn lần sau nhé!", "error").then(() => startIdleSpin());
                 } else {
                     winA.play().catch(()=>{}); confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-                    let img = dynamicImages[p] ? `<img src="${dynamicImages[p]}" class="dancing-prize" onerror="this.style.display='none'">` : '';
+                    
+                    let rawDynamicImg = dynamicImages[p];
+                    let realImgSrc = rawDynamicImg;
+                    if (rawDynamicImg && rawDynamicImg.includes('http')) {
+                        realImgSrc = rawDynamicImg.substring(rawDynamicImg.indexOf('http')); 
+                    }
+                    
+                    let img = realImgSrc ? `<img src="${realImgSrc}" class="dancing-prize" onerror="this.style.display='none'">` : '';
                     Swal.fire({ title: 'TUYỆT VỜI!', html: `Chúc mừng bạn đã trúng:<br><b style="color:#dc3545; font-size:22px;">${p}</b>` + img, icon: 'success' }).then(() => startIdleSpin());
                     user.prizes = p; 
                 }
                 user.spinHistory = res.spinHistory; 
                 localStorage.setItem('tvu_user_session', JSON.stringify(user)); renderUser();
-                
             }, 5000);
         });
     }
